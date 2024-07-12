@@ -1,0 +1,30 @@
+- name: Install i3 and related packages
+  apt:
+    name:
+      - i3
+      - i3status
+      - i3lock
+      - dmenu
+      - xserver-xorg
+      - xinit
+      - lightdm
+    state: present
+  become: true
+- name: Set i3 as default window manager
+  command: update-alternatives --set x-window-manager /usr/bin/i3
+  become: true
+- name: Ensure i3 config directory exists
+  file:
+    path: "/home/{{ ansible_user }}/.config/i3"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0755
+- name: Copy the default i3 config
+  copy:
+    src: /etc/i3/config
+    dest: "/home/{{ ansible_user }}/.config/i3/config"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0644
+    remote_src: true

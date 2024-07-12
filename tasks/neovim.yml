@@ -1,0 +1,40 @@
+- name: Download latest Neovim release
+  get_url:
+    url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+    dest: /tmp/nvim-linux64.tar.gz
+    mode: 0644
+
+- name: Remove existing Neovim installation
+  file:
+    path: /opt/nvim
+    state: absent
+  become: true
+
+- name: Extract Neovim to /opt
+  unarchive:
+    src: /tmp/nvim-linux64.tar.gz
+    dest: /opt
+    remote_src: true
+  become: true
+
+- name: Clean up downloaded archive
+  file:
+    path: /tmp/nvim-linux64.tar.gz
+    state: absent
+
+- name: Add directory to system-wide PATH if not already present
+  block:
+    - name: Read current PATH from /etc/environment
+      command: grep '^PATH=' /etc/environment
+      register: current_path
+      changed_when: false
+      failed_when: false
+
+    - name: Update PATH in /etc/environment
+      lineinfile:
+        path: /etc/environment
+        regexp: "^PATH=[\"']?(.*?)[\"']?$"
+        line: 'PATH="\1:/opt/nvim-linux64/bin"'
+        backrefs: true
+      when: "'/opt/nvim-linux64/bin' not in current_path.stdout"
+      become: true

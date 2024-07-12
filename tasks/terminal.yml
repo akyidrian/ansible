@@ -19,9 +19,9 @@
 - name: Clone Gogh repository
   git:
     repo: https://github.com/Gogh-Co/Gogh.git
-    dest: ~/ansible/gogh
+    dest: /tmp/gogh
 - name: Install Tokyo Night theme
-  shell: ~/ansible/gogh/installs/tokyo-night.sh
+  shell: /tmp/gogh/installs/tokyo-night.sh
   environment:
     TERMINAL: gnome-terminal
   become: true
@@ -59,5 +59,37 @@
 - name: Load dconf settings for GNOME terminal
   shell: dconf load /org/gnome/terminal/ < ~/.gnome-terminal.dconf 
   become_user: "{{ ansible_user }}"
+  become: true
+- name: Clone fzf repository
+  git:
+    repo: https://github.com/junegunn/fzf.git
+    dest: ~/.fzf
+    depth: 1
+    version: master
+- name: Run fzf install script
+  command: ~/.fzf/install --all
+  args:
+    creates: ~/.fzf/bin/fzf
+- name: Install fd-find and bat
+  apt:
+    name:
+      - fd-find
+      - bat
+    state: present
+  become: true
+- name: Ensure pip3 is installed
+  apt:
+    name: python3-pip
+    state: present
+  become: true
+- name: Install tldr using pip3
+  pip:
+    name: tldr
+    executable: pip3
+    state: present
+- name: Install tmux
+  apt:
+    name: tmux
+    state: present
   become: true
 

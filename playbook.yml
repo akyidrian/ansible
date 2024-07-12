@@ -10,6 +10,7 @@
         update_cache: yes
         cache_valid_time: 3600 # seconds
       become: true
+      tags: always
   tasks:
     - import_tasks: tasks/dotfiles.yml
       tags: dotfiles
@@ -17,3 +18,10 @@
       tags: zsh
     - import_tasks: tasks/terminal.yml
       tags: terminal
+    - import_tasks: tasks/neovim.yml
+      tags: neovim
+    - import_tasks: tasks/i3.yml
+      tags: i3
+    - import_tasks: tasks/docker.yml
+      tags: docker
+
