@@ -15,7 +15,7 @@
     force: yes
 - name: Copy chezmoi key
   copy:
-    src: "{{ chezmoi_key_file_name }}"
+    src: "chezmoi/{{ chezmoi_key_file_name }}"
     dest: "{{chezmoi_key_full_path}}" 
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
@@ -30,7 +30,7 @@
     group: "{{ ansible_user }}"
 - name: Configure chezmoi
   template:
-    src: chezmoi.toml.j2
+    src: "chezmoi/{{ chezmoi_config_file_name }}.j2"
     dest: "{{ chezmoi_config_full_path }}"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
