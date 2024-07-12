@@ -1,0 +1,8 @@
+chezmoi_install_full_path: ~/.local/bin/chezmoi
+chezmoi_source_path: ~/.local/share/chezmoi
+chezmoi_config_path: ~/.config/chezmoi
+chezmoi_key_file_name: chezmoi-key.txt
+chezmoi_key_full_path: "{{ chezmoi_source_path }}/{{ chezmoi_key_file_name }}"
+chezmoi_config_file_name: chezmoi.toml
+chezmoi_config_full_path: "{{ chezmoi_config_path }}/{{ chezmoi_config_file_name }}"
+chezmoi_recipient_public_key: age18rh5aj4yw4dyh3vf3vvy0p0mtfa5x5we5evgqgrcz7ls3pqndcjsye8ypy

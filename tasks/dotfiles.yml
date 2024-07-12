@@ -1,0 +1,39 @@
+- name: Install age encryption tool
+  apt:
+    name: age
+    state: present
+  become: true
+- name: Install chezmoi dotfile manager tool
+  shell: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $HOME/.local/bin
+  register: chezmoi_install_result
+  changed_when: "'info installed ' + chezmoi_install_full_path in chezmoi_install_result.stdout"
+- name: Checkout dotfiles
+  git:
+    repo: https://github.com/akyidrian/dotfiles.git
+    dest: "{{ chezmoi_source_path }}"
+    accept_hostkey: yes
+    force: yes
+- name: Copy chezmoi key
+  copy:
+    src: "{{ chezmoi_key_file_name }}"
+    dest: "{{chezmoi_key_full_path}}" 
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0600
+    decrypt: yes
+- name: Ensure chezmoi config directory exists
+  file:
+    path: "{{ chezmoi_config_path }}"
+    state: directory
+    mode: 0755
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+- name: Configure chezmoi
+  template:
+    src: chezmoi.toml.j2
+    dest: "{{ chezmoi_config_full_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0600
+- name: Apply dotfiles
+  command: "{{ chezmoi_install_full_path }} apply"
