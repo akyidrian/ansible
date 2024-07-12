@@ -15,3 +15,5 @@
       tags: dotfiles
     - import_tasks: tasks/zsh.yml
       tags: zsh
+    - import_tasks: tasks/terminal.yml
+      tags: terminal
