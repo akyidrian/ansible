@@ -12,3 +12,6 @@
       become: true
   tasks:
     - import_tasks: tasks/dotfiles.yml
+      tags: dotfiles
+    - import_tasks: tasks/zsh.yml
+      tags: zsh
