@@ -3,12 +3,14 @@
     name: gnome-terminal
     state: present
   become: true
+
 - name: Set default terminal to gnome-terminal
   alternatives:
     name: x-terminal-emulator
     path: /usr/bin/gnome-terminal
     link: /usr/bin/x-terminal-emulator
   become: true
+
 - name: Install Gogh dependencies
   apt:
     name:
@@ -16,6 +18,7 @@
       - uuid-runtime
     state: present
   become: true
+
 - name: Clone Gogh repository
   git:
     repo: https://github.com/Gogh-Co/Gogh.git
@@ -26,50 +29,60 @@
     TERMINAL: gnome-terminal
   become: true
   become_user: "{{ ansible_user }}"
+
 - name: Ensure the fonts directory exists
   file:
     path: ~/.local/share/fonts
     state: directory
     mode: 0755
+
 - name: Download RobotoMono
   get_url:
     url: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/RobotoMono.zip
     dest: ~/.local/share/fonts/RobotoMono.zip
     mode: 0644
+
 - name: Install unzip 
   apt:
     name: unzip
     state: present
   become: true
+
 - name: Unzip RobotoMono
   unarchive:
     src: ~/.local/share/fonts/RobotoMono.zip 
     dest: ~/.local/share/fonts
     remote_src: yes
+
 - name: Update font cache
   shell: fc-cache ~/.local/share/fonts
   register: fc_cache_result
   changed_when: fc_cache_result.rc == 0
+
 - name: Ensure RobotoMono font is available
   shell: fc-list | grep -i roboto
   register: fc_list_result
   changed_when:
     - fc_list_result.rc == 0
     - fc_list_result.stdout_lines | length > 0
+
 - name: Load dconf settings for GNOME terminal
   shell: dconf load /org/gnome/terminal/ < ~/.gnome-terminal.dconf 
   become_user: "{{ ansible_user }}"
   become: true
+
 - name: Clone fzf repository
   git:
     repo: https://github.com/junegunn/fzf.git
     dest: ~/.fzf
     depth: 1
     version: master
+
 - name: Run fzf install script
   command: ~/.fzf/install --all
   args:
     creates: ~/.fzf/bin/fzf
+
 - name: Install fd-find and bat
   apt:
     name:
@@ -77,16 +90,19 @@
       - bat
     state: present
   become: true
+
 - name: Ensure pip3 is installed
   apt:
     name: python3-pip
     state: present
   become: true
+
 - name: Install tldr using pip3
   pip:
     name: tldr
     executable: pip3
     state: present
+
 - name: Install tmux
   apt:
     name: tmux

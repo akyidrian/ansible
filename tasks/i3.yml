@@ -10,9 +10,11 @@
       - lightdm
     state: present
   become: true
+
 - name: Set i3 as default window manager
   command: update-alternatives --set x-window-manager /usr/bin/i3
   become: true
+
 - name: Ensure i3 config directory exists
   file:
     path: "/home/{{ ansible_user }}/.config/i3"
@@ -20,6 +22,7 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: 0755
+
 - name: Copy the default i3 config
   copy:
     src: /etc/i3/config

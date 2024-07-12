@@ -3,15 +3,18 @@
     name: zsh
     state: present
   become: true
+
 - name: Make zsh default shell
   user:
     name: "{{ ansible_user }}"
     shell: /usr/bin/zsh
   become: true
+
 - name: Check if ohmyzsh is installed
   stat:
     path: "{{ ansible_env.HOME }}/.oh-my-zsh"
   register: omz_dir
+
 - name: Install ohmyzsh
   shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended "" --keep-zshrc
   when: not omz_dir.stat.exists

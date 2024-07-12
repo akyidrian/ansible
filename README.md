@@ -14,3 +14,8 @@ If you're tired of entering the vault password and deleting host keys, create a 
 ```bash
 ansible-playbook -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory playbook.yml --vault-password-file vault-password.txt -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no'"
 ```
+
+To run ansible-playbook locally:
+```bash
+ansible-playbook -i localhost, -c local playbook.yml --ask-vault-pass -e "ansible_user=[my-user-here]"
+```
