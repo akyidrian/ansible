@@ -1,0 +1,4 @@
+*.txt
+!chezmoi*.txt
+
+.vagrant
