@@ -1,10 +1,19 @@
 ---
 - hosts: all
+  gather_facts: true
   vars:
     ansible_python_interpreter: auto_silent
   vars_files:
     vars/chezmoi.yml
   pre_tasks:
+    - name: Set effective_user (allows for local or remote execution)
+      set_fact:
+        effective_user: "{{ ansible_user | default(lookup('env', 'USER')) }}"
+      tags: always
+    - name: Set user_home (as $HOME may not be /home/$USER)
+      set_fact:
+        user_home: "{{ ansible_env.HOME }}"
+      tags: always
     - name: Update apt cache
       apt:
         update_cache: yes

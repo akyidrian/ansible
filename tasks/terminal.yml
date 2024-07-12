@@ -28,18 +28,18 @@
   environment:
     TERMINAL: gnome-terminal
   become: true
-  become_user: "{{ ansible_user }}"
+  become_user: "{{ effective_user }}"
 
 - name: Ensure the fonts directory exists
   file:
-    path: ~/.local/share/fonts
+    path: "{{ user_home }}/.local/share/fonts"
     state: directory
     mode: 0755
 
 - name: Download RobotoMono
   get_url:
     url: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/RobotoMono.zip
-    dest: ~/.local/share/fonts/RobotoMono.zip
+    dest: "{{ user_home }}/.local/share/fonts/RobotoMono.zip"
     mode: 0644
 
 - name: Install unzip 
@@ -50,12 +50,12 @@
 
 - name: Unzip RobotoMono
   unarchive:
-    src: ~/.local/share/fonts/RobotoMono.zip 
-    dest: ~/.local/share/fonts
+    src: "{{ user_home }}/.local/share/fonts/RobotoMono.zip"
+    dest: "{{ user_home }}/.local/share/fonts"
     remote_src: yes
 
 - name: Update font cache
-  shell: fc-cache ~/.local/share/fonts
+  shell: fc-cache "{{ user_home }}/.local/share/fonts"
   register: fc_cache_result
   changed_when: fc_cache_result.rc == 0
 
@@ -67,21 +67,21 @@
     - fc_list_result.stdout_lines | length > 0
 
 - name: Load dconf settings for GNOME terminal
-  shell: dconf load /org/gnome/terminal/ < ~/.gnome-terminal.dconf 
-  become_user: "{{ ansible_user }}"
+  shell: dconf load /org/gnome/terminal/ < "{{ user_home }}/.gnome-terminal.dconf"
+  become_user: "{{ effective_user }}"
   become: true
 
 - name: Clone fzf repository
   git:
     repo: https://github.com/junegunn/fzf.git
-    dest: ~/.fzf
+    dest: "{{ user_home }}/.fzf"
     depth: 1
     version: master
 
 - name: Run fzf install script
-  command: ~/.fzf/install --all
+  command: "{{ user_home }}/.fzf/install --all"
   args:
-    creates: ~/.fzf/bin/fzf
+    creates: "{{ user_home }}/.fzf/bin/fzf"
 
 - name: Install fd-find and bat
   apt:

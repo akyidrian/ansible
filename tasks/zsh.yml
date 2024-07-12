@@ -6,13 +6,13 @@
 
 - name: Make zsh default shell
   user:
-    name: "{{ ansible_user }}"
+    name: "{{ effective_user }}"
     shell: /usr/bin/zsh
   become: true
 
 - name: Check if ohmyzsh is installed
   stat:
-    path: "{{ ansible_env.HOME }}/.oh-my-zsh"
+    path: "{{ user_home }}/.oh-my-zsh"
   register: omz_dir
 
 - name: Install ohmyzsh

@@ -11,15 +11,15 @@
 
 - name: Ensure GPG directory exists
   file:
-    path: "/home/{{ ansible_user }}/.gnupg"
+    path: "{{ user_home }}/.gnupg"
     state: directory
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: "{{ effective_user }}"
+    group: "{{ effective_user }}"
     mode: 0700
 
 - name: Initialize GPG keyring
   command: gpg --list-keys
-  become_user: "{{ ansible_user }}"
+  become_user: "{{ effective_user }}"
   become: true
   changed_when: false
 
@@ -62,7 +62,7 @@
 
 - name: Add user to docker group
   user:
-    name: "{{ ansible_user }}"
+    name: "{{ effective_user }}"
     groups: docker
     append: true
   become: true
