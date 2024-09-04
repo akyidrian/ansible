@@ -9,7 +9,7 @@ set -o pipefail # don't hide errors within pipes
 readonly ANSIBLE_GITHUB_URL="https://github.com/akyidrian/ansible.git"
 declare SCRIPT_NAME SCRIPTS_DIR DOWNLOAD_DIR
 SCRIPT_NAME=$(basename "${0}")
-SCRIPTS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOWNLOAD_DIR=$(mktemp -d -p /tmp "${SCRIPT_NAME}.XXXXXX")
 readonly SCRIPT_NAME SCRIPTS_DIR DOWNLOAD_DIR
 
@@ -23,7 +23,7 @@ main() {
     git clone --depth 1 --branch main "${ANSIBLE_GITHUB_URL}" "${DOWNLOAD_DIR}"
     (
         cd "${DOWNLOAD_DIR}" || exit
-        ansible-playbook -i localhost, -c local playbook.yml --ask-vault-pass
+        ansible-playbook --inventory localhost, --connection local --ask-vault-pass "${SCRIPTS_DIR}/playbook.yml"
     )
 }
 main "${@}"

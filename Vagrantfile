@@ -6,7 +6,7 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/jammy64" # 22.04
   config.ssh.insert_key = false
-  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder ".", "/home/vagrant/ansible"
 
   config.vm.provider :virtualbox do |v|
     v.cpus = 2
@@ -15,6 +15,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.customize ['modifyvm', :id, '--graphicscontroller', 'vmsvga']
     v.linked_clone = true
     v.gui = true
+  end
+
+  if Vagrant.has_plugin?("vagrant-vbguest")
+    config.vbguest.auto_update = false
+    config.vbguest.no_remote = true
   end
 
   config.vm.provision "ansible" do |ansible|
