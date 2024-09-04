@@ -70,6 +70,7 @@
   shell: dconf load /org/gnome/terminal/ < "{{ user_home }}/.gnome-terminal.dconf"
   become_user: "{{ effective_user }}"
   become: true
+  when: ansible_virtualization_type != "docker"
 
 - name: Clone fzf repository
   git:

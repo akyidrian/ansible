@@ -34,10 +34,12 @@
   register: gpg_import_result
   changed_when: false
 
-- name: Fail if Docker GPG key is invalid
-  fail:
-    msg: "Invalid Docker GPG key"
-  when: "'9DC858229FC7DD38854AE2D88D81803C0EBFCD88' not in gpg_import_result.stdout"
+- name: Check Docker GPG key validity
+  assert:
+    that:
+      - "'9DC858229FC7DD38854AE2D88D81803C0EBFCD88' in gpg_import_result.stdout"
+    success_msg: "Docker GPG key is valid"
+    fail_msg: "Invalid Docker GPG key"
 
 - name: Add Docker GPG key to keyring
   command: gpg --dearmor --batch --yes -o /usr/share/keyrings/docker-archive-keyring.gpg /tmp/docker.gpg
@@ -73,10 +75,12 @@
     state: restarted
     enabled: true
   become: true
+  when: ansible_virtualization_type != "docker"
 
 - name: Ensure Docker is running
   systemd:
     name: docker
     state: started
   become: true
+  when: ansible_virtualization_type != "docker"
 

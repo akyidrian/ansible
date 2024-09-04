@@ -1,6 +1,8 @@
-- name: Install age encryption tool
+- name: Install prerequisites
   apt:
-    name: age
+    name:
+      - age
+      - curl
     state: present
   become: true
 - name: Install chezmoi dotfile manager tool
