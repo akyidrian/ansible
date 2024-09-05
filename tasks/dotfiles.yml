@@ -5,16 +5,19 @@
       - curl
     state: present
   become: true
+
 - name: Install chezmoi dotfile manager tool
   shell: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $HOME/.local/bin
   register: chezmoi_install_result
   changed_when: "'info installed ' + chezmoi_install_full_path in chezmoi_install_result.stdout"
+
 - name: Checkout dotfiles
   git:
     repo: https://github.com/akyidrian/dotfiles.git
     dest: "{{ chezmoi_source_path }}"
     accept_hostkey: yes
     force: yes
+
 - name: Copy chezmoi key
   copy:
     src: "chezmoi/{{ chezmoi_key_file_name }}"
@@ -23,6 +26,7 @@
     group: "{{ effective_user }}"
     mode: 0600
     decrypt: yes
+
 - name: Ensure chezmoi config directory exists
   file:
     path: "{{ chezmoi_config_path }}"
@@ -30,6 +34,7 @@
     mode: 0755
     owner: "{{ effective_user }}"
     group: "{{ effective_user }}"
+
 - name: Configure chezmoi
   template:
     src: "chezmoi/{{ chezmoi_config_file_name }}.j2"
@@ -37,5 +42,6 @@
     owner: "{{ effective_user }}"
     group: "{{ effective_user }}"
     mode: 0600
+
 - name: Apply dotfiles
   command: "{{ chezmoi_install_full_path }} apply"
