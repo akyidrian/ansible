@@ -15,6 +15,15 @@
   command: update-alternatives --set x-window-manager /usr/bin/i3
   become: true
 
+- name: Verify i3 is set as default window manager
+  command: update-alternatives --query x-window-manager
+  register: i3_set_verify_result
+  changed_when: false
+  failed_when:
+    - "'Value: /usr/bin/i3' not in i3_set_verify_result.stdout" # not set to default
+    - "'Status: manual' not in i3_set_verify_result.stdout" # not set manually
+
+# TODO: Once I have my own config, I should rely on chezmoi...
 - name: Ensure i3 config directory exists
   file:
     path: "{{ user_home }}/.config/i3"
@@ -23,6 +32,7 @@
     group: "{{ effective_user }}"
     mode: 0755
 
+# TODO: Once I have my own config, I should rely on chezmoi...
 - name: Copy the default i3 config
   copy:
     src: /etc/i3/config
