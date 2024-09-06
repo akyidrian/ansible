@@ -80,6 +80,6 @@
     name: docker
     state: restarted
     enabled: true
-    daemon_reload: yes
+    daemon_reload: true
   become: true
   when: ansible_virtualization_type != "docker"

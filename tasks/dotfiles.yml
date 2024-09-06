@@ -20,7 +20,7 @@
   git:
     repo: https://github.com/akyidrian/dotfiles.git
     dest: "{{ chezmoi_source_path }}"
-    force: yes
+    force: true
 
 - name: Copy chezmoi key (for decrypting encrypted dotfiles)
   copy:
@@ -29,7 +29,7 @@
     owner: "{{ effective_user }}"
     group: "{{ effective_user }}"
     mode: 0600
-    decrypt: yes
+    decrypt: true
 
 - name: Ensure chezmoi config directory exists
   file:

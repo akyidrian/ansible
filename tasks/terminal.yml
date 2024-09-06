@@ -54,14 +54,14 @@
 - name: Download RobotoMono font
   get_url:
     url: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/RobotoMono.zip
-    dest: "{{ user_home }}/.local/share/fonts/RobotoMono.zip"
+    dest: "/tmp/RobotoMono.zip"
     mode: 0644
 
 - name: Unzip RobotoMono font archive
   unarchive:
-    src: "{{ user_home }}/.local/share/fonts/RobotoMono.zip"
+    src: "/tmp/RobotoMono.zip"
     dest: "{{ user_home }}/.local/share/fonts"
-    remote_src: yes
+    remote_src: true
 
 - name: Update font cache
   shell: fc-cache "{{ user_home }}/.local/share/fonts"
