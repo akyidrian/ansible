@@ -3,6 +3,7 @@
     name:
       - age
       - curl
+      - git
     state: present
   become: true
 

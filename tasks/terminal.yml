@@ -1,3 +1,12 @@
+- name: Install terminal prerequisites
+  apt:
+    name:
+      - git
+      - python3-pip
+      - unzip
+    state: present
+  become: true
+
 - name: Install gnome-terminal
   apt:
     name: gnome-terminal
@@ -48,12 +57,6 @@
     dest: "{{ user_home }}/.local/share/fonts/RobotoMono.zip"
     mode: 0644
 
-- name: Install RobotoMono font prerequisites
-  apt:
-    name: unzip
-    state: present
-  become: true
-
 - name: Unzip RobotoMono font archive
   unarchive:
     src: "{{ user_home }}/.local/share/fonts/RobotoMono.zip"
@@ -102,12 +105,6 @@
       - bat
       - fd-find
       - tmux
-    state: present
-  become: true
-
-- name: Install tldr prerequisites
-  apt:
-    name: python3-pip
     state: present
   become: true
 
