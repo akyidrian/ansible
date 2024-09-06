@@ -1,4 +1,5 @@
-chezmoi_install_full_path: "{{ user_home }}/.local/bin/chezmoi"
+chezmoi_install_path: "{{ user_home }}/.local/bin"
+chezmoi_install_full_path: "{{ chezmoi_install_path}}/chezmoi"
 chezmoi_source_path: "{{ user_home }}/.local/share/chezmoi"
 chezmoi_config_path: "{{ user_home }}/.config/chezmoi"
 chezmoi_key_file_name: chezmoi-key.txt

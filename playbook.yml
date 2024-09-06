@@ -21,6 +21,10 @@
       become: true
       tags: always
   tasks:
+    - fail:
+        msg: "Playbook was written for Debian OS family"
+      when: ansible_os_family != 'Debian'
+
     - import_tasks: tasks/dotfiles.yml
       tags: dotfiles
     - import_tasks: tasks/zsh.yml
