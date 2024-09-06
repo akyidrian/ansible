@@ -18,11 +18,10 @@
   become: true
 
 - name: Install ohmyzsh
-  shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended "" --keep-zshrc
+  shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended --keep-zshrc
   register: omz_install_result
   vars:
     omz_path: "{{ user_home }}/.oh-my-zsh"
   changed_when: "'Cloning Oh My Zsh...' in omz_install_result.stdout"
-  failed_when:
-    - omz_install_result.rc != 0
-    - not (omz_path is directory)
+  failed_when: omz_install_result.rc != 0
+  when: omz_path is not directory

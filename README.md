@@ -5,9 +5,10 @@ Download and run `run-local.sh` to conveniently provision your new developer mac
 ```bash
 sudo apt update && sudo apt install ansible git -y
 git clone --depth 1 --branch main "https://github.com/akyidrian/ansible.git" /tmp/ansible
-ansible-playbook --inventory localhost, --connection local --ask-vault-pass --tags all --skip-tags "" /tmp/ansible/playbook.yml
+cd /tmp
+ansible-playbook --inventory localhost, --connection local --ask-vault-pass --tags all --skip-tags "" ansible/playbook.yml
 # or, if you have a `vault-password.txt`
-ansible-playbook --inventory localhost, --connection local --vault-password-file /tmp/ansible/vault-password.txt --tags all --skip-tags "" /tmp/ansible/playbook.yml
+ansible-playbook --inventory localhost, --connection local --vault-password-file ansible/vault-password.txt --tags all --skip-tags "" ansible/playbook.yml
 ```
 
 Note, you can list available playbook tags with:
