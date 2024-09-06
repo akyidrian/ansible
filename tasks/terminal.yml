@@ -11,19 +11,25 @@
     link: /usr/bin/x-terminal-emulator
   become: true
 
-- name: Install Gogh dependencies
-  apt:
-    name:
-      - dconf-cli
-      - uuid-runtime
-    state: present
-  become: true
-
-- name: Clone Gogh repository
+- name: Clone gogh repository
   git:
     repo: https://github.com/Gogh-Co/Gogh.git
     dest: /tmp/gogh
-- name: Install Tokyo Night theme
+    depth: 1
+    force: true
+    version: master
+
+- name: Install gogh dependencies
+  apt:
+    name:
+      - dconf-cli
+    state: present
+  become: true
+
+# FIXME: We assume this task just works without checking. We rely on
+# .gnome-terminal.dconf (during the later `dconf load` task) to
+# properly select the new theme profile.
+- name: Install tokyo night theme profile
   shell: /tmp/gogh/installs/tokyo-night.sh
   environment:
     TERMINAL: gnome-terminal
@@ -36,19 +42,19 @@
     state: directory
     mode: 0755
 
-- name: Download RobotoMono
+- name: Download RobotoMono font
   get_url:
     url: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/RobotoMono.zip
     dest: "{{ user_home }}/.local/share/fonts/RobotoMono.zip"
     mode: 0644
 
-- name: Install unzip 
+- name: Install RobotoMono font prerequisites
   apt:
     name: unzip
     state: present
   become: true
 
-- name: Unzip RobotoMono
+- name: Unzip RobotoMono font archive
   unarchive:
     src: "{{ user_home }}/.local/share/fonts/RobotoMono.zip"
     dest: "{{ user_home }}/.local/share/fonts"
@@ -57,56 +63,56 @@
 - name: Update font cache
   shell: fc-cache "{{ user_home }}/.local/share/fonts"
   register: fc_cache_result
-  changed_when: fc_cache_result.rc == 0
+  failed_when: fc_cache_result.rc != 0
 
 - name: Ensure RobotoMono font is available
   shell: fc-list | grep -i roboto
   register: fc_list_result
-  changed_when:
-    - fc_list_result.rc == 0
-    - fc_list_result.stdout_lines | length > 0
+  failed_when: >
+    fc_list_result.rc != 0 or
+    fc_list_result.stdout_lines | length == 0
 
+# FIXME: We just assume this task works without checking...
 - name: Load dconf settings for GNOME terminal
-  shell: dconf load /org/gnome/terminal/ < "{{ user_home }}/.gnome-terminal.dconf"
+  shell: dconf load /org/gnome/terminal/ < "{{ gt_dconf_full_path }}"
   become_user: "{{ effective_user }}"
   become: true
-  when: ansible_virtualization_type != "docker"
+  vars:
+    - gt_dconf_full_path: "{{ user_home }}/.gnome-terminal.dconf"
+  when:
+    - ansible_virtualization_type != "docker" # no dconf in docker
+    - gt_dconf_full_path is file # we need this dotfile
 
 - name: Clone fzf repository
   git:
     repo: https://github.com/junegunn/fzf.git
     dest: "{{ user_home }}/.fzf"
     depth: 1
+    force: true
     version: master
 
-- name: Run fzf install script
+- name: Install fzf
   command: "{{ user_home }}/.fzf/install --all"
-  args:
-    creates: "{{ user_home }}/.fzf/bin/fzf"
+  register: fzf_install_result
+  changed_when: "'+ Added' in fzf_install_result.stdout"
 
-- name: Install fd-find and bat
+- name: Install terminal tools
   apt:
     name:
-      - fd-find
       - bat
+      - fd-find
+      - tmux
     state: present
   become: true
 
-- name: Ensure pip3 is installed
+- name: Install tldr prerequisites
   apt:
     name: python3-pip
     state: present
   become: true
 
-- name: Install tldr using pip3
+- name: Install tldr terminal tool
   pip:
     name: tldr
     executable: pip3
     state: present
-
-- name: Install tmux
-  apt:
-    name: tmux
-    state: present
-  become: true
-
