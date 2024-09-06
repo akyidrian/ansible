@@ -4,9 +4,10 @@
   vars:
     ansible_python_interpreter: auto_silent
   vars_files:
-    vars/chezmoi.yml
+    - vars/chezmoi.yml
+    - vars/docker.yml
   pre_tasks:
-    - name: Set effective_user (allows for local or remote execution)
+    - name: Set effective_user (for local or remote execution)
       set_fact:
         effective_user: "{{ ansible_user | default(lookup('env', 'USER')) }}"
       tags: always

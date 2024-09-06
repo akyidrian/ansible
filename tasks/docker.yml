@@ -9,7 +9,7 @@
     state: present
   become: true
 
-- name: Ensure GPG directory exists
+- name: Ensure gpg directory exists
   file:
     path: "{{ user_home }}/.gnupg"
     state: directory
@@ -17,37 +17,43 @@
     group: "{{ effective_user }}"
     mode: 0700
 
-- name: Initialize GPG keyring
+- name: Initialize gpg keyring
   command: gpg --list-keys
   become_user: "{{ effective_user }}"
   become: true
   changed_when: false
 
-- name: Download docker GPG key
+- name: Download docker gpg key
   get_url:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    dest: /tmp/docker.gpg
+    url: "{{ docker_download_url }}/gpg"
+    dest: /tmp/{{ docker_gpg_file_name }}
     mode: 0644
 
-- name: Verify docker GPG key
-  command: gpg --dry-run --quiet --import --import-options import-show /tmp/docker.gpg
-  register: gpg_import_result
+- name: Perform dry-run to obtain docker gpg key
+  command: gpg --dry-run --quiet --import --import-options import-show /tmp/{{ docker_gpg_file_name }}
+  register: docker_gpg_import_result
   changed_when: false
 
-- name: Check Docker GPG key validity
+- name: Confirm docker gpg fingerprint
   assert:
-    that:
-      - "'9DC858229FC7DD38854AE2D88D81803C0EBFCD88' in gpg_import_result.stdout"
-    success_msg: "Docker GPG key is valid"
-    fail_msg: "Invalid Docker GPG key"
+    that: docker_gpg_fingerprint in docker_gpg_import_result.stdout
+    success_msg: "Docker gpg key is valid"
+    fail_msg: "Docker gpg key is invalid"
 
-- name: Add Docker GPG key to keyring
-  command: gpg --dearmor --batch --yes -o /usr/share/keyrings/docker-archive-keyring.gpg /tmp/docker.gpg
-  become: true 
+- name: Add docker gpg key to keyring
+  command: gpg --dearmor --batch --yes -o {{ docker_gpg_full_path }} /tmp/{{ docker_gpg_file_name }}
+  become: true
+
+- name: Verify docker gpg key was added to keyring
+  command: gpg --no-default-keyring --keyring {{ docker_gpg_full_path }} --list-keys
+  become: true
+  register: docker_gpg_verify_result
+  changed_when: false
+  failed_when: docker_gpg_verify_result.rc != 0 or docker_gpg_verify_result.stdout == ""
 
 - name: Add Docker repository
   apt_repository:
-    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    repo: "deb [arch=amd64 signed-by={{ docker_gpg_full_path }}] {{ docker_download_url }} {{ ansible_distribution_release }} stable"
     filename: docker
     state: present
   become: true
@@ -69,18 +75,11 @@
     append: true
   become: true
 
-- name: Restart Docker service
+- name: Restarted docker and ensure its running
   systemd:
     name: docker
     state: restarted
     enabled: true
+    daemon_reload: yes
   become: true
   when: ansible_virtualization_type != "docker"
-
-- name: Ensure Docker is running
-  systemd:
-    name: docker
-    state: started
-  become: true
-  when: ansible_virtualization_type != "docker"
-

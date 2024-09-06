@@ -1,0 +1,4 @@
+docker_download_url: https://download.docker.com/linux/ubuntu
+docker_gpg_file_name: docker-archive-keyring.gpg
+docker_gpg_full_path: /usr/share/keyrings/{{ docker_gpg_file_name }}
+docker_gpg_fingerprint: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
